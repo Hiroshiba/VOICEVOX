@@ -4,9 +4,9 @@ import {
   IpcMainInvokeEvent,
   IpcRendererEvent,
 } from "electron";
+import { wrapToIpcResult } from "./ipcResultHelper";
 import { IpcIHData, IpcSOData } from "@/type/ipc";
 import { createLogger } from "@/helpers/log";
-import { errorToMessage } from "@/helpers/errorHelper";
 
 const log = createLogger("ipc");
 
@@ -45,7 +45,7 @@ export function registerIpcMainHandle(listeners: {
   [key: string]: (event: IpcMainInvokeEvent, ...args: unknown[]) => unknown;
 }) {
   Object.entries(listeners).forEach(([channel, listener]) => {
-    const errorHandledListener: typeof listener = async (event, ...args) => {
+    const errorHandledListener: typeof listener = (event, ...args) => {
       try {
         validateIpcSender(event);
       } catch (e) {
@@ -55,12 +55,7 @@ export function registerIpcMainHandle(listeners: {
 
       // 例外はメッセージのみがレンダラーに提供されるため、メッセージを詰め直す
       // ref: https://github.com/electron/electron/issues/24427
-      try {
-        return await listener(event, ...args);
-      } catch (e) {
-        log.error(e);
-        throw new Error(errorToMessage(e));
-      }
+      return wrapToIpcResult(() => listener(event, ...args));
     };
     ipcMain.handle(channel, errorHandledListener);
   });
