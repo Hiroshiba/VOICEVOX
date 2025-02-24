@@ -53,8 +53,6 @@ export function registerIpcMainHandle(listeners: {
         return;
       }
 
-      // 例外はメッセージのみがレンダラーに提供されるため、メッセージを詰め直す
-      // ref: https://github.com/electron/electron/issues/24427
       return wrapToIpcResult(() => listener(event, ...args));
     };
     ipcMain.handle(channel, errorHandledListener);
