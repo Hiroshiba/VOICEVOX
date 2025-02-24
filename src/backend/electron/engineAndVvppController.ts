@@ -59,7 +59,6 @@ export class EngineAndVvppController {
     try {
       await this.vvppManager.install(vvppPath, callbacks);
     } catch (e) {
-      log.error(`Failed to install ${vvppPath},`, e);
       throw new Error(`${vvppPath} をインストールできませんでした。`, {
         cause: e,
       });
@@ -95,6 +94,7 @@ export class EngineAndVvppController {
     try {
       await this.installVvppEngine(vvppPath);
     } catch (e) {
+      log.error(e);
       dialog.showErrorBox("インストールエラー", errorToMessage(e));
       return;
     }
@@ -141,7 +141,6 @@ export class EngineAndVvppController {
       // そのため、アプリの終了時に削除するようにする。
       this.vvppManager.markWillDelete(engineId);
     } catch (e) {
-      log.error(`Failed to uninstall ${engineId},`, e);
       throw new Error(`${engineId} をアンインストールできませんでした。`, {
         cause: e,
       });
