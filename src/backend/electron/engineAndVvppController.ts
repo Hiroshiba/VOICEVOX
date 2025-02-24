@@ -60,13 +60,6 @@ export class EngineAndVvppController {
       await this.vvppManager.install(vvppPath, callbacks);
     } catch (e) {
       log.error(`Failed to install ${vvppPath},`, e);
-      console.log(
-        errorToMessage(
-          new Error(`${vvppPath} をインストールできませんでした。`, {
-            cause: e,
-          }),
-        ),
-      );
       throw new Error(`${vvppPath} をインストールできませんでした。`, {
         cause: e,
       });
